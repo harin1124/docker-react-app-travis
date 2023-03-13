@@ -1,0 +1,19 @@
+# 관리자 권한을 얻기 위해서
+sudo: required
+
+language: generic
+
+services:
+  - docker
+
+before_install:
+  - echo "start creating an image with dockerfile"
+  - docker build -t movhr/docker-react-app-travis -f Dockerfile.dev .
+
+script:
+  # 테스트 진행
+  # -- --coverage => 더 자세한 설명을 보기 위한 옵션
+  - docker run -e CI=true movhr/docker-react-app-travis npm run test -- --coverage
+
+after_success:
+  - echo "Test success"
