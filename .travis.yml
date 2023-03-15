@@ -39,5 +39,5 @@ deploy:
   # on-branch: 어떤 브랜치에 push를 할 때 AWS에 배포를 할 것인지
   on:
     breanch: "main"
-  access_key: $AWS_ACCESS_KEY
+  access_key_id: $AWS_ACCESS_KEY
   secret_access_key: $AWS_SECRET_ACCESS_KEY
