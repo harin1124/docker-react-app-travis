@@ -7,13 +7,37 @@ services:
   - docker
 
 before_install:
-  - echo "start creating an image with dockerfile"
-  - docker build -t movhr/docker-react-app-travis -f Dockerfile.dev .
+  - echo "start creating an image with dockerfile" # 단순 텍스트 출력
+  - docker build -t movhr/docker-react-app-travis -f Dockerfile.dev . # 도커 빌드 실행
 
 script:
-  # 테스트 진행
+  # 빌드한 이미지를 실행 시키는 명령어
+  # 후에, 테스트도 실행한다.
   # -- --coverage => 더 자세한 설명을 보기 위한 옵션
   - docker run -e CI=true movhr/docker-react-app-travis npm run test -- --coverage
 
 after_success:
   - echo "Test success"
+
+# 배포에 관련된 부분
+deploy:
+  # provider: 외부 서비스 표시
+  provider: elasticbeanstalk
+  # region: 현재 사용하고 있는 AWS의 서비스가 위치하고 있는 물리적 장소
+  region: "ap-northeast-2"
+  # app: 생성된 애플리케이션의 이름
+  app: "docker-react-app-travis"
+  # env: 환경설정 명칭
+  env: "Dockerreactapptravis-env"
+  # bucket_name: 해당 elasticbeanstalk을 위한 s3 버켓 이름
+    # s3는 안에다가 파일들 저장해 놓는 것
+    # bucket_name이 필요한 이유 : travisCI에서 elasticbeanstalk 통해서 배포할 때, 바로 AWS로 가는 것이 아니라, travisCI에서 가지고 있는 파일을 압축해서 먼저 s3에 보내기 때문이다.
+    # s3를 생성한 적이 없는데? : elasticbeanstalk는 환경이기 때문에, 설치할 때 자동으로 같이 설치된다.
+  bucket_name: "elasticbeanstalk-ap-northeast-2-603163904456"
+  # bucket_path: 생성된 애플리케이션의 이름
+  bucket_path: "docker-react-app-travis"
+  # on-branch: 어떤 브랜치에 push를 할 때 AWS에 배포를 할 것인지
+  on:
+    breanch: "main"
+  access_key: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
